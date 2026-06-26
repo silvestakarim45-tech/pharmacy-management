@@ -75,7 +75,6 @@ if(isset($_GET['search'])){
                         <th>Idadi</th>
                         <th>Bei ya Kuuza</th>
                         <th>Tarehe ya Kuisha</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,11 +92,6 @@ if(isset($_GET['search'])){
                         </td>
                         <td>TZS <?php echo number_format($row['selling_price'], 2); ?></td>
                         <td><?php echo $row['expiry_date']; ?></td>
-                        <td>
-                            <span class="alert <?php echo $row['status'] == 'available' ? 'alert-success' : 'alert-danger'; ?>" style="padding: 5px 10px; font-size: 12px;">
-                                <?php echo ucfirst($row['status']); ?>
-                            </span>
-                        </td>
                     </tr>
                     <?php
                     }

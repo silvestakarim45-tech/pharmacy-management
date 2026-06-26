@@ -103,7 +103,7 @@ $medicines=mysqli_query($conn,
                         while($row=mysqli_fetch_assoc($medicines)){
                         ?>
                         <option value="<?php echo $row['medicine_id']; ?>">
-                            <?php echo $row['medicine_name']; ?> (Stock: <?php echo $row['quantity']; ?>)
+                            <?php echo $row['medicine_name']; ?> (Stock: <?php echo $row['quantity']; ?>) - TZS <?php echo number_format($row['selling_price'], 2); ?>
                         </option>
                         <?php } ?>
                     </select>

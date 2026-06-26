@@ -11,7 +11,7 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'seller'){
 $seller_id = $_SESSION['user_id'];
 
 $medicines=mysqli_query($conn,
-"SELECT * FROM medicines WHERE status='available'");
+"SELECT * FROM medicines");
 
 if(isset($_POST['sell'])){
     $medicine_id=$_POST['medicine_id'];
@@ -106,7 +106,7 @@ if(isset($_POST['sell'])){
                         while($row=mysqli_fetch_assoc($medicines)){
                         ?>
                         <option value="<?php echo $row['medicine_id']; ?>">
-                            <?php echo $row['medicine_name']; ?> (Stock: <?php echo $row['quantity']; ?>)
+                            <?php echo $row['medicine_name']; ?> (Stock: <?php echo $row['quantity']; ?>) - TZS <?php echo number_format($row['selling_price'], 2); ?>
                         </option>
                         <?php } ?>
                     </select>

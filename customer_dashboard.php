@@ -18,7 +18,7 @@ $customer_result = mysqli_stmt_get_result($stmt);
 $customer = mysqli_fetch_assoc($customer_result);
 
 // Get all available medicines
-$medicines_query = "SELECT * FROM medicines WHERE status='available' AND quantity > 0 ORDER BY medicine_name ASC";
+$medicines_query = "SELECT * FROM medicines WHERE quantity > 0 ORDER BY medicine_name ASC";
 $medicines_result = mysqli_query($conn, $medicines_query);
 
 // Handle add to cart
