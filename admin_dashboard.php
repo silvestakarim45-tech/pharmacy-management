@@ -1,0 +1,214 @@
+<?php
+session_start();
+include("config.php");
+
+// Check if user is logged in and is admin
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
+    header("Location: login.php");
+    exit();
+}
+
+// Get system statistics
+$medicines_count=mysqli_num_rows(mysqli_query($conn,"SELECT * FROM medicines"));
+$customers_count=mysqli_num_rows(mysqli_query($conn,"SELECT * FROM customers"));
+$sellers_count=mysqli_num_rows(mysqli_query($conn,"SELECT * FROM users WHERE role='seller'"));
+$sales_count=mysqli_num_rows(mysqli_query($conn,"SELECT * FROM sales"));
+$orders_count=mysqli_num_rows(mysqli_query($conn,"SELECT * FROM orders"));
+
+// Get total sales amount
+$total_sales_query = "SELECT SUM(total_amount) as total FROM sales";
+$total_sales_result = mysqli_query($conn, $total_sales_query);
+$total_sales = mysqli_fetch_assoc($total_sales_result);
+$total_sales_amount = $total_sales['total'] ? $total_sales['total'] : 0;
+
+// Get total orders amount
+$total_orders_query = "SELECT SUM(total_amount) as total FROM orders WHERE status='completed'";
+$total_orders_result = mysqli_query($conn, $total_orders_query);
+$total_orders = mysqli_fetch_assoc($total_orders_result);
+$total_orders_amount = $total_orders['total'] ? $total_orders['total'] : 0;
+
+// Get low stock items
+$low_stock=mysqli_query($conn,"SELECT * FROM medicines WHERE quantity < 10");
+
+// Get expiring medicines
+$expiry = mysqli_query($conn,"SELECT * FROM medicines WHERE expiry_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
+
+// Get recent orders
+$recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
+                                    JOIN customers c ON o.customer_id = c.customer_id
+                                    ORDER BY o.order_date DESC LIMIT 5");
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - Pharmacy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="admin-panel">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>🏥 Pharmacy</h1>
+            <p>Admin Portal</p>
+        </div>
+        <div class="sidebar-menu">
+            <ul>
+                <li><a href="admin_dashboard.php" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="medicine.php"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
+                <li><a href="inventory_management.php"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+                <li><a href="suppliers.php"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
+                <li><a href="sales_analytics.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+                <li><a href="audit_logs.php"><i class="fas fa-history"></i> <span>Audit Logs</span></a></li>
+                <li><a href="database_backup.php"><i class="fas fa-database"></i> <span>Backup</span></a></li>
+                <li><a href="admin_users.php"><i class="fas fa-users"></i> <span>Famasia</span></a></li>
+                <li><a href="admin_customers.php"><i class="fas fa-user-friends"></i> <span>Wateja</span></a></li>
+                <li><a href="admin_orders.php"><i class="fas fa-shopping-bag"></i> <span>Agizo</span></a></li>
+                <li><a href="sales.php"><i class="fas fa-cash-register"></i> <span>Mauzo</span></a></li>
+                <li><a href="deily_report.php"><i class="fas fa-chart-line"></i> <span>Ripoti ya Siku</span></a></li>
+                <li><a href="monthly_report.php"><i class="fas fa-calendar-alt"></i> <span>Ripoti ya Mwezi</span></a></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <a href="logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-header">
+            <h2>👑 Admin Dashboard</h2>
+            <div class="user-info">
+                <span>Admin: <?php echo $_SESSION['fullname']; ?></span>
+            </div>
+        </div>
+
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="icon">📦</div>
+                <h3>Jumla ya Dawa</h3>
+                <div class="number"><?php echo $medicines_count; ?></div>
+            </div>
+
+            <div class="stat-card success">
+                <div class="icon">👥</div>
+                <h3>Jumla ya Wateja</h3>
+                <div class="number"><?php echo $customers_count; ?></div>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="icon">🛒</div>
+                <h3>Famasia</h3>
+                <div class="number"><?php echo $sellers_count; ?></div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="icon">💰</div>
+                <h3>Mauzo (POS)</h3>
+                <div class="number"><?php echo $sales_count; ?></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="icon">📋</div>
+                <h3>Agizo Mtandaoni</h3>
+                <div class="number"><?php echo $orders_count; ?></div>
+            </div>
+
+            <div class="stat-card success">
+                <div class="icon">💵</div>
+                <h3>Jumla ya Mauzo</h3>
+                <div class="number"><?php echo number_format($total_sales_amount, 0); ?></div>
+            </div>
+        </div>
+
+        <div class="container" style="margin-bottom: 30px;">
+            <div class="header">
+                <h2>📋 Agizo za Hivi Karibuni</h2>
+            </div>
+
+            <?php if(mysqli_num_rows($recent_orders) > 0): ?>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Mteja</th>
+                        <th>Jumla</th>
+                        <th>Status</th>
+                        <th>Tarehe</th>
+                        <th>Matendo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($order = mysqli_fetch_assoc($recent_orders)): ?>
+                    <tr>
+                        <td>#<?php echo $order['order_id']; ?></td>
+                        <td><?php echo $order['customer_name']; ?></td>
+                        <td>TZS <?php echo number_format($order['total_amount'], 2); ?></td>
+                        <td>
+                            <?php
+                            $status_class = '';
+                            switch($order['status']){
+                                case 'pending': $status_class = 'alert-warning'; break;
+                                case 'processing': $status_class = 'alert-info'; break;
+                                case 'completed': $status_class = 'alert-success'; break;
+                                case 'cancelled': $status_class = 'alert-danger'; break;
+                            }
+                            ?>
+                            <span class="alert <?php echo $status_class; ?>" style="display: inline-block; padding: 5px 10px; font-size: 12px;">
+                                <?php echo ucfirst($order['status']); ?>
+                            </span>
+                        </td>
+                        <td><?php echo date('Y-m-d H:i', strtotime($order['order_date'])); ?></td>
+                        <td>
+                            <a href="order_details.php?id=<?php echo $order['order_id']; ?>" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">Angalia</a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+            <?php else: ?>
+            <div class="alert alert-info">Hakuna agizo bado</div>
+            <?php endif; ?>
+        </div>
+
+        <div class="container">
+            <div class="header">
+                <h2>⚠️ Dawa Zilizopo Stoo </h2>
+            </div>
+            <?php
+            if(mysqli_num_rows($low_stock) > 0){
+                echo "<div class='alert alert-danger'>";
+                while($row=mysqli_fetch_assoc($low_stock)){
+                    echo "<strong>" . $row['medicine_name'] . "</strong> - Stock inabaki: " . $row['quantity'] . "<br>";
+                }
+                echo "</div>";
+            } else {
+                echo "<div class='alert alert-success'>Dawa zote zina stock ya kutosha</div>";
+            }
+            ?>
+        </div>
+
+        <div class="container" style="margin-top: 30px;">
+            <div class="header">
+                <h2>⏰ Dawa Zinazokaribia Kuisha Muda wake</h2>
+            </div>
+            <?php
+            if(mysqli_num_rows($expiry) > 0){
+                echo "<div class='alert alert-warning'>";
+                while($row = mysqli_fetch_assoc($expiry)){
+                    echo "<strong>" . $row['medicine_name'] . "</strong> - Itaisha muda: " . $row['expiry_date'] . "<br>";
+                }
+                echo "</div>";
+            } else {
+                echo "<div class='alert alert-success'>Hakuna dawa zinazokaribia kuisha muda</div>";
+            }
+            ?>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
