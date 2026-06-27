@@ -12,7 +12,7 @@ $medicines = [
         'buying_price' => 200,
         'selling_price' => 500,
         'quantity' => 100,
-        'expiry_date' => '2025-12-31',
+        'expiry_date' => '2027-12-31',
         'reorder_point' => 20
     ],
     [
@@ -22,7 +22,7 @@ $medicines = [
         'buying_price' => 500,
         'selling_price' => 1200,
         'quantity' => 50,
-        'expiry_date' => '2025-06-30',
+        'expiry_date' => '2027-06-30',
         'reorder_point' => 15
     ],
     [
@@ -32,7 +32,7 @@ $medicines = [
         'buying_price' => 300,
         'selling_price' => 800,
         'quantity' => 75,
-        'expiry_date' => '2025-09-15',
+        'expiry_date' => '2027-09-15',
         'reorder_point' => 20
     ],
     [
@@ -42,7 +42,7 @@ $medicines = [
         'buying_price' => 400,
         'selling_price' => 1000,
         'quantity' => 60,
-        'expiry_date' => '2025-08-20',
+        'expiry_date' => '2027-08-20',
         'reorder_point' => 15
     ],
     [
@@ -52,7 +52,7 @@ $medicines = [
         'buying_price' => 150,
         'selling_price' => 400,
         'quantity' => 120,
-        'expiry_date' => '2026-01-15',
+        'expiry_date' => '2028-01-15',
         'reorder_point' => 30
     ],
     [
@@ -62,7 +62,7 @@ $medicines = [
         'buying_price' => 250,
         'selling_price' => 600,
         'quantity' => 80,
-        'expiry_date' => '2025-11-30',
+        'expiry_date' => '2027-11-30',
         'reorder_point' => 20
     ],
     [
@@ -72,7 +72,7 @@ $medicines = [
         'buying_price' => 180,
         'selling_price' => 450,
         'quantity' => 90,
-        'expiry_date' => '2025-10-25',
+        'expiry_date' => '2027-10-25',
         'reorder_point' => 25
     ],
     [
@@ -82,7 +82,7 @@ $medicines = [
         'buying_price' => 350,
         'selling_price' => 900,
         'quantity' => 55,
-        'expiry_date' => '2025-07-15',
+        'expiry_date' => '2027-07-15',
         'reorder_point' => 15
     ],
     [
@@ -92,7 +92,7 @@ $medicines = [
         'buying_price' => 450,
         'selling_price' => 1100,
         'quantity' => 70,
-        'expiry_date' => '2026-02-28',
+        'expiry_date' => '2028-02-28',
         'reorder_point' => 20
     ],
     [
@@ -102,7 +102,7 @@ $medicines = [
         'buying_price' => 300,
         'selling_price' => 750,
         'quantity' => 40,
-        'expiry_date' => '2025-05-30',
+        'expiry_date' => '2027-05-30',
         'reorder_point' => 10
     ],
     [
@@ -112,7 +112,7 @@ $medicines = [
         'buying_price' => 100,
         'selling_price' => 300,
         'quantity' => 150,
-        'expiry_date' => '2026-06-30',
+        'expiry_date' => '2028-06-30',
         'reorder_point' => 40
     ],
     [
@@ -122,7 +122,7 @@ $medicines = [
         'buying_price' => 2000,
         'selling_price' => 3500,
         'quantity' => 25,
-        'expiry_date' => '2027-01-01',
+        'expiry_date' => '2029-01-01',
         'reorder_point' => 10
     ],
     [
@@ -132,7 +132,7 @@ $medicines = [
         'buying_price' => 15000,
         'selling_price' => 25000,
         'quantity' => 10,
-        'expiry_date' => '2027-06-30',
+        'expiry_date' => '2029-06-30',
         'reorder_point' => 5
     ],
     [
@@ -142,7 +142,7 @@ $medicines = [
         'buying_price' => 500,
         'selling_price' => 1200,
         'quantity' => 200,
-        'expiry_date' => '2025-04-15',
+        'expiry_date' => '2027-04-15',
         'reorder_point' => 50
     ],
     [
@@ -152,7 +152,7 @@ $medicines = [
         'buying_price' => 5000,
         'selling_price' => 8000,
         'quantity' => 30,
-        'expiry_date' => '2025-03-31',
+        'expiry_date' => '2027-03-31',
         'reorder_point' => 10
     ]
 ];
