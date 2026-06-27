@@ -36,6 +36,18 @@ $expiry = mysqli_query($conn,"SELECT * FROM medicines WHERE expiry_date <= DATE_
 // Get all medicines for the toggle view
 $all_medicines = mysqli_query($conn,"SELECT * FROM medicines ORDER BY medicine_name ASC");
 
+// Get all customers for the toggle view
+$all_customers = mysqli_query($conn,"SELECT * FROM customers ORDER BY customer_name ASC");
+
+// Get all sellers for the toggle view
+$all_sellers = mysqli_query($conn,"SELECT * FROM users WHERE role='seller' ORDER BY fullname ASC");
+
+// Get all sales for the toggle view
+$all_sales = mysqli_query($conn,"SELECT s.*, m.medicine_name FROM sales s JOIN medicines m ON s.medicine_id = m.medicine_id ORDER BY s.sale_date DESC LIMIT 20");
+
+// Get all orders for the toggle view
+$all_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o JOIN customers c ON o.customer_id = c.customer_id ORDER BY o.order_date DESC LIMIT 20");
+
 // Get recent orders
 $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                                     JOIN customers c ON o.customer_id = c.customer_id
@@ -139,34 +151,204 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                 </div>
             </div>
 
-            <div class="stat-card success">
+            <!-- Customers List (Hidden by default) -->
+            <div id="customersList" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>👥 Orodha ya Wateja Wote</h2>
+                    </div>
+
+                    <?php if(mysqli_num_rows($all_customers) > 0): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Jina la Mteja</th>
+                                <th>Simu</th>
+                                <th>Anuani</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($customer = mysqli_fetch_assoc($all_customers)): ?>
+                            <tr>
+                                <td><?php echo $customer['customer_id']; ?></td>
+                                <td><strong><?php echo $customer['customer_name']; ?></strong></td>
+                                <td><?php echo $customer['phone'] ?: '-'; ?></td>
+                                <td><?php echo $customer['address'] ?: '-'; ?></td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <div class="alert alert-info">Hakuna wateja bado</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="stat-card success" onclick="toggleCustomers()" style="cursor: pointer;">
                 <div class="icon">👥</div>
                 <h3>Jumla ya Wateja</h3>
                 <div class="number"><?php echo $customers_count; ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona wateja</small>
             </div>
 
-            <div class="stat-card warning">
+            <!-- Sellers List (Hidden by default) -->
+            <div id="sellersList" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>🛒 Orodha ya Famasia Wote</h2>
+                    </div>
+
+                    <?php if(mysqli_num_rows($all_sellers) > 0): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Jina Kamili</th>
+                                <th>Username</th>
+                                <th>Simu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($seller = mysqli_fetch_assoc($all_sellers)): ?>
+                            <tr>
+                                <td><?php echo $seller['user_id']; ?></td>
+                                <td><strong><?php echo $seller['fullname']; ?></strong></td>
+                                <td><?php echo $seller['username']; ?></td>
+                                <td><?php echo $seller['phone'] ?: '-'; ?></td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <div class="alert alert-info">Hakuna famasia bado</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="stat-card warning" onclick="toggleSellers()" style="cursor: pointer;">
                 <div class="icon">🛒</div>
                 <h3>Famasia</h3>
                 <div class="number"><?php echo $sellers_count; ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona famasia</small>
             </div>
 
-            <div class="stat-card info">
+            <!-- Sales List (Hidden by default) -->
+            <div id="salesList" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>💰 Orodha ya Mauzo (POS)</h2>
+                    </div>
+
+                    <?php if(mysqli_num_rows($all_sales) > 0): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Dawa</th>
+                                <th>Idadi</th>
+                                <th>Jumla (TZS)</th>
+                                <th>Tarehe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($sale = mysqli_fetch_assoc($all_sales)): ?>
+                            <tr>
+                                <td><?php echo $sale['sale_id']; ?></td>
+                                <td><strong><?php echo $sale['medicine_name']; ?></strong></td>
+                                <td><?php echo $sale['quantity_sold']; ?></td>
+                                <td><?php echo number_format($sale['total_amount'], 2); ?></td>
+                                <td><?php echo date('Y-m-d H:i', strtotime($sale['sale_date'])); ?></td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <div class="alert alert-info">Hakuna mauzo bado</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="stat-card info" onclick="toggleSales()" style="cursor: pointer;">
                 <div class="icon">💰</div>
                 <h3>Mauzo (POS)</h3>
                 <div class="number"><?php echo $sales_count; ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona mauzo</small>
             </div>
 
-            <div class="stat-card">
+            <!-- Orders List (Hidden by default) -->
+            <div id="ordersList" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>📋 Orodha ya Agizo Mtandaoni</h2>
+                    </div>
+
+                    <?php if(mysqli_num_rows($all_orders) > 0): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Mteja</th>
+                                <th>Jumla</th>
+                                <th>Status</th>
+                                <th>Tarehe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($order = mysqli_fetch_assoc($all_orders)): ?>
+                            <tr>
+                                <td>#<?php echo $order['order_id']; ?></td>
+                                <td><?php echo $order['customer_name']; ?></td>
+                                <td>TZS <?php echo number_format($order['total_amount'], 2); ?></td>
+                                <td><?php echo ucfirst($order['status']); ?></td>
+                                <td><?php echo date('Y-m-d H:i', strtotime($order['order_date'])); ?></td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <div class="alert alert-info">Hakuna agizo bado</div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="stat-card" onclick="toggleOrders()" style="cursor: pointer;">
                 <div class="icon">📋</div>
                 <h3>Agizo Mtandaoni</h3>
                 <div class="number"><?php echo $orders_count; ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona agizo</small>
             </div>
 
-            <div class="stat-card success">
+            <!-- Revenue Info (Hidden by default) -->
+            <div id="revenueInfo" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>💵 Maelezo ya Mapato</h2>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="alert alert-success">
+                            <h3>Jumla ya Mauzo (POS)</h3>
+                            <p style="font-size: 24px; font-weight: bold;">TZS <?php echo number_format($total_sales_amount, 2); ?></p>
+                        </div>
+                        <div class="alert alert-info">
+                            <h3>Jumla ya Agizo Mtandaoni</h3>
+                            <p style="font-size: 24px; font-weight: bold;">TZS <?php echo number_format($total_orders_amount, 2); ?></p>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning" style="margin-top: 20px;">
+                        <h3>Jumla ya Mapato Yote</h3>
+                        <p style="font-size: 28px; font-weight: bold;">TZS <?php echo number_format($total_sales_amount + $total_orders_amount, 2); ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card success" onclick="toggleRevenue()" style="cursor: pointer;">
                 <div class="icon">💵</div>
                 <h3>Jumla ya Mauzo</h3>
                 <div class="number"><?php echo number_format($total_sales_amount, 0); ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona mapato</small>
             </div>
         </div>
 
@@ -263,6 +445,51 @@ function toggleMedicines() {
         medicinesList.style.display = 'block';
     } else {
         medicinesList.style.display = 'none';
+    }
+}
+
+function toggleCustomers() {
+    var customersList = document.getElementById('customersList');
+    if (customersList.style.display === 'none') {
+        customersList.style.display = 'block';
+    } else {
+        customersList.style.display = 'none';
+    }
+}
+
+function toggleSellers() {
+    var sellersList = document.getElementById('sellersList');
+    if (sellersList.style.display === 'none') {
+        sellersList.style.display = 'block';
+    } else {
+        sellersList.style.display = 'none';
+    }
+}
+
+function toggleSales() {
+    var salesList = document.getElementById('salesList');
+    if (salesList.style.display === 'none') {
+        salesList.style.display = 'block';
+    } else {
+        salesList.style.display = 'none';
+    }
+}
+
+function toggleOrders() {
+    var ordersList = document.getElementById('ordersList');
+    if (ordersList.style.display === 'none') {
+        ordersList.style.display = 'block';
+    } else {
+        ordersList.style.display = 'none';
+    }
+}
+
+function toggleRevenue() {
+    var revenueInfo = document.getElementById('revenueInfo');
+    if (revenueInfo.style.display === 'none') {
+        revenueInfo.style.display = 'block';
+    } else {
+        revenueInfo.style.display = 'none';
     }
 }
 </script>
