@@ -64,13 +64,6 @@ if(isset($_GET['expiry_status']) && !empty($_GET['expiry_status'])){
     }
 }
 
-if(isset($_GET['status']) && !empty($_GET['status'])){
-    $status = $_GET['status'];
-    $where_conditions[] = "status = ?";
-    $params[] = $status;
-    $types .= "s";
-}
-
 $sql = "SELECT * FROM medicines";
 if(!empty($where_conditions)){
     $sql .= " WHERE " . implode(" AND ", $where_conditions);
@@ -179,16 +172,6 @@ $categories_result = mysqli_query($conn, $categories_query);
                             <option value="">-- Zote --</option>
                             <option value="expiring" <?php echo (isset($_GET['expiry_status']) && $_GET['expiry_status'] == 'expiring') ? 'selected' : ''; ?>>Inayokaribia Kuisha</option>
                             <option value="expired" <?php echo (isset($_GET['expiry_status']) && $_GET['expiry_status'] == 'expired') ? 'selected' : ''; ?>>Imeisha Muda</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="">-- Zote --</option>
-                            <option value="available" <?php echo (isset($_GET['status']) && $_GET['status'] == 'available') ? 'selected' : ''; ?>>Available</option>
-                            <option value="unavailable" <?php echo (isset($_GET['status']) && $_GET['status'] == 'unavailable') ? 'selected' : ''; ?>>Unavailable</option>
                         </select>
                     </div>
                 </div>

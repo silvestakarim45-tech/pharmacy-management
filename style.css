@@ -35,8 +35,11 @@ body {
     position: fixed;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     z-index: 1000;
+    scrollbar-width: thin;
+    scrollbar-color: #3498db #2c3e50;
 }
 
 .sidebar-header {

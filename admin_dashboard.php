@@ -33,6 +33,9 @@ $low_stock=mysqli_query($conn,"SELECT * FROM medicines WHERE quantity < 10");
 // Get expiring medicines
 $expiry = mysqli_query($conn,"SELECT * FROM medicines WHERE expiry_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)");
 
+// Get all medicines for the toggle view
+$all_medicines = mysqli_query($conn,"SELECT * FROM medicines ORDER BY medicine_name ASC");
+
 // Get recent orders
 $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                                     JOIN customers c ON o.customer_id = c.customer_id
@@ -87,10 +90,53 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
         </div>
 
         <div class="dashboard-stats">
-            <div class="stat-card">
+            <div class="stat-card" onclick="toggleMedicines()" style="cursor: pointer;">
                 <div class="icon">📦</div>
                 <h3>Jumla ya Dawa</h3>
                 <div class="number"><?php echo $medicines_count; ?></div>
+                <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona dawa</small>
+            </div>
+
+            <!-- Medicines List (Hidden by default) -->
+            <div id="medicinesList" style="display: none; grid-column: 1 / -1; margin-top: 20px;">
+                <div class="container">
+                    <div class="header">
+                        <h2>📋 Orodha ya Dawa Zote</h2>
+                    </div>
+
+                    <?php if(mysqli_num_rows($all_medicines) > 0): ?>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Jina la Dawa</th>
+                                <th>Kategori</th>
+                                <th>Stock</th>
+                                <th>Bei ya Kuuza</th>
+                                <th>Tarehe ya Kuisha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while($medicine = mysqli_fetch_assoc($all_medicines)): ?>
+                            <tr>
+                                <td><?php echo $medicine['medicine_id']; ?></td>
+                                <td><strong><?php echo $medicine['medicine_name']; ?></strong></td>
+                                <td><?php echo $medicine['category']; ?></td>
+                                <td>
+                                    <span style="color: <?php echo $medicine['quantity'] < 10 ? '#e74c3c' : '#27ae60'; ?>; font-weight: bold;">
+                                        <?php echo $medicine['quantity']; ?>
+                                    </span>
+                                </td>
+                                <td>TZS <?php echo number_format($medicine['selling_price'], 2); ?></td>
+                                <td><?php echo $medicine['expiry_date']; ?></td>
+                            </tr>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <div class="alert alert-info">Hakuna dawa bado</div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <div class="stat-card success">
@@ -209,6 +255,17 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
         </div>
     </div>
 </div>
+
+<script>
+function toggleMedicines() {
+    var medicinesList = document.getElementById('medicinesList');
+    if (medicinesList.style.display === 'none') {
+        medicinesList.style.display = 'block';
+    } else {
+        medicinesList.style.display = 'none';
+    }
+}
+</script>
 
 </body>
 </html>
