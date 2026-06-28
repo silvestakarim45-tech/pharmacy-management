@@ -44,6 +44,7 @@ if(isset($_GET['search'])){
                 <li><a href="seller_sales.php"><i class="fas fa-cash-register"></i> <span>Mauzo</span></a></li>
                 <li><a href="seller_medicines.php" class="active"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
                 <li><a href="seller_orders.php"><i class="fas fa-shopping-bag"></i> <span>Agizo Mtandaoni</span></a></li>
+                <li><a href="seller_profile.php"><i class="fas fa-user"></i> <span>Profaili Yangu</span></a></li>
             </ul>
         </div>
         <div class="sidebar-footer">
