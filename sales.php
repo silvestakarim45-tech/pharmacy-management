@@ -31,8 +31,16 @@ $medicines=mysqli_query($conn,
         </div>
         <div class="sidebar-menu">
             <ul>
-                <li><a href="dashboard.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                <li><a href="admin_dashboard.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
                 <li><a href="medicine.php"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
+                <li><a href="inventory_management.php"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+                <li><a href="suppliers.php"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
+                <li><a href="sales_analytics.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
+                <li><a href="audit_logs.php"><i class="fas fa-history"></i> <span>Audit Logs</span></a></li>
+                <li><a href="database_backup.php"><i class="fas fa-database"></i> <span>Backup</span></a></li>
+                <li><a href="admin_users.php"><i class="fas fa-users"></i> <span>Famasia</span></a></li>
+                <li><a href="admin_customers.php"><i class="fas fa-user-friends"></i> <span>Wateja</span></a></li>
+                <li><a href="admin_orders.php"><i class="fas fa-shopping-bag"></i> <span>Agizo</span></a></li>
                 <li><a href="sales.php" class="active"><i class="fas fa-cash-register"></i> <span>Mauzo</span></a></li>
                 <li><a href="deily_report.php"><i class="fas fa-chart-line"></i> <span>Ripoti ya Siku</span></a></li>
                 <li><a href="monthly_report.php"><i class="fas fa-calendar-alt"></i> <span>Ripoti ya Mwezi</span></a></li>
