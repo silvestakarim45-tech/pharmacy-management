@@ -27,7 +27,7 @@ if(isset($_POST['create_backup'])){
     $db_name = 'pharmacy_management';
     
     // Create backup using mysqldump
-    $command = "C:\xampp\mysql\bin\mysqldump -h$db_host -u$db_user -p$db_pass $db_name > $backup_file";
+    $command = "C:/xampp/mysql/bin/mysqldump.exe -h$db_host -u$db_user -p$db_pass $db_name > $backup_file 2>&1";
     
     // Try to execute the command
     if(function_exists('exec')){
@@ -36,7 +36,7 @@ if(isset($_POST['create_backup'])){
         if($return_var === 0 && file_exists($backup_file)){
             $success = "Backup created successfully: " . basename($backup_file);
         } else {
-            $error = "Failed to create backup using mysqldump. Trying alternative method...";
+            $error = "Failed to create backup using mysqldump. Return code: $return_var. Output: " . implode(", ", $output) . ". Trying alternative method...";
             
             // Alternative: PHP-based backup
             $backup_content = "-- Database Backup: $db_name\n";

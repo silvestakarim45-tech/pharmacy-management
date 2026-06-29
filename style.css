@@ -11,6 +11,12 @@ body {
     color: #333;
 }
 
+/* Login page specific background override */
+body.login-page {
+    background: url('pexels-karola-g-4040568.jpg') no-repeat center center fixed !important;
+    background-size: cover !important;
+}
+
 /* Login Container */
 .login-container {
     max-width: 400px;

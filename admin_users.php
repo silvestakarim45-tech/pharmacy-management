@@ -61,12 +61,71 @@ if(isset($_POST['add_user'])){
     }
 }
 
+// Handle user editing
+if(isset($_POST['edit_user'])){
+    // Verify CSRF token
+    if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
+        $error = "Security token invalid";
+    } else {
+        $user_id = $_POST['user_id'];
+        $username = sanitize_input($_POST['username']);
+        $fullname = sanitize_input($_POST['fullname']);
+        $email = sanitize_input($_POST['email']);
+        $phone = sanitize_input($_POST['phone']);
+        $role = $_POST['role'];
+        $password = $_POST['password'];
+
+        // Validate inputs
+        if(!validate_username($username)){
+            $error = "Username format batili";
+        } elseif(!validate_email($email)){
+            $error = "Email batili";
+        } elseif(!validate_phone($phone)){
+            $error = "Namba ya simu batili";
+        } else {
+            // Update user info
+            if(!empty($password)){
+                // If password is provided, update it too
+                if(!validate_password($password)){
+                    $error = "Password inapaswa kuwa angalau characters 6";
+                } else {
+                    $password = password_hash($password, PASSWORD_DEFAULT);
+                    $sql = "UPDATE users SET username=?, fullname=?, email=?, phone=?, role=?, password=? WHERE user_id=?";
+                    $stmt = mysqli_prepare($conn, $sql);
+                    mysqli_stmt_bind_param($stmt, "ssssssi", $username, $fullname, $email, $phone, $role, $password, $user_id);
+                    mysqli_stmt_execute($stmt);
+                }
+            } else {
+                // Update without password
+                $sql = "UPDATE users SET username=?, fullname=?, email=?, phone=?, role=? WHERE user_id=?";
+                $stmt = mysqli_prepare($conn, $sql);
+                mysqli_stmt_bind_param($stmt, "sssssi", $username, $fullname, $email, $phone, $role, $user_id);
+                mysqli_stmt_execute($stmt);
+            }
+            header("Location: admin_users.php");
+            exit();
+        }
+    }
+}
+
 // Get all users except current admin
 $users_query = "SELECT * FROM users WHERE user_id!=? ORDER BY user_id DESC";
 $stmt = mysqli_prepare($conn, $users_query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
 mysqli_stmt_execute($stmt);
 $users_result = mysqli_stmt_get_result($stmt);
+
+// Get user to edit if edit mode is active
+$edit_user = null;
+if(isset($_GET['edit_id'])){
+    $edit_id = $_GET['edit_id'];
+    $edit_query = "SELECT * FROM users WHERE user_id=?";
+    $edit_stmt = mysqli_prepare($conn, $edit_query);
+    mysqli_stmt_bind_param($edit_stmt, "i", $edit_id);
+    mysqli_stmt_execute($edit_stmt);
+    $edit_result = mysqli_stmt_get_result($edit_stmt);
+    $edit_user = mysqli_fetch_assoc($edit_result);
+}
 ?>
 
 <!DOCTYPE html>
@@ -118,45 +177,53 @@ $users_result = mysqli_stmt_get_result($stmt);
 
         <div class="container">
             <div class="header">
-                <h2>➕ Ongeza Famasia Mpya</h2>
+                <h2><?php echo $edit_user ? '✏️ Hariri Taarifa za Famasia' : '➕ Ongeza Famasia Mpya'; ?></h2>
             </div>
 
             <form method="POST">
                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                <?php if($edit_user): ?>
+                    <input type="hidden" name="user_id" value="<?php echo $edit_user['user_id']; ?>">
+                <?php endif; ?>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" name="username" placeholder="Username" required>
+                        <input type="text" name="username" placeholder="Username" value="<?php echo $edit_user ? $edit_user['username'] : ''; ?>" required>
                     </div>
                     <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" placeholder="Password" required>
+                        <label>Password <?php echo $edit_user ? '(acha wazi usibadilishe)' : ''; ?></label>
+                        <input type="password" name="password" placeholder="<?php echo $edit_user ? 'Acha wazi usibadilishe password' : 'Password'; ?>" <?php echo $edit_user ? '' : 'required'; ?>>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Jina Kamili</label>
-                        <input type="text" name="fullname" placeholder="Jina kamili" required>
+                        <input type="text" name="fullname" placeholder="Jina kamili" value="<?php echo $edit_user ? $edit_user['fullname'] : ''; ?>" required>
                     </div>
                     <div class="form-group">
                         <label>Role</label>
                         <select name="role" required>
-                            <option value="seller">Seller</option>
-                            <option value="admin">Admin</option>
+                            <option value="seller" <?php echo $edit_user && $edit_user['role'] == 'seller' ? 'selected' : ''; ?>>Seller</option>
+                            <option value="admin" <?php echo $edit_user && $edit_user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="email" name="email" placeholder="Email">
+                        <input type="email" name="email" placeholder="Email" value="<?php echo $edit_user ? $edit_user['email'] : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label>Simu</label>
-                        <input type="tel" name="phone" placeholder="Namba ya simu">
+                        <input type="tel" name="phone" placeholder="Namba ya simu" value="<?php echo $edit_user ? $edit_user['phone'] : ''; ?>">
                     </div>
                 </div>
-                <button type="submit" name="add_user" class="btn btn-success">➕ Ongeza Famasia</button>
+                <?php if($edit_user): ?>
+                    <button type="submit" name="edit_user" class="btn btn-success">✏️ Save Mabadiliko</button>
+                    <a href="admin_users.php" class="btn btn-danger" style="display: inline-block; padding: 10px 20px; text-decoration: none; margin-left: 10px;">❌ Cancel</a>
+                <?php else: ?>
+                    <button type="submit" name="add_user" class="btn btn-success">➕ Ongeza Famasia</button>
+                <?php endif; ?>
             </form>
         </div>
 
@@ -189,6 +256,7 @@ $users_result = mysqli_stmt_get_result($stmt);
                             </span>
                         </td>
                         <td>
+                            <a href="admin_users.php?edit_id=<?php echo $user['user_id']; ?>" class="btn btn-info" style="padding: 5px 10px; font-size: 12px; display: inline-block; text-decoration: none;">✏️ Edit</a>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                                 <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
