@@ -63,27 +63,13 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
 <head>
     <title>Pharmacy Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: url('pexels-karola-g-4040568.jpg') no-repeat center center fixed;
-            background-size: cover;
-            min-height: 100vh;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .login-container {
             max-width: 400px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             padding: 40px;
+            margin: 100px auto;
         }
         .header {
             text-align: center;
@@ -114,6 +100,7 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 16px;
+            box-sizing: border-box;
         }
         .form-group input:focus {
             outline: none;
@@ -143,7 +130,8 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
         }
     </style>
 </head>
-<body>
+<body style="margin: 0; padding: 0; min-height: 100vh;">
+<img src="pexels-karola-g-4040568.jpg" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1;" alt="Background">
 
 <div class="login-container">
     <div class="header">
