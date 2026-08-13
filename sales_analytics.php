@@ -249,14 +249,21 @@ new Chart(dailySalesCtx, {
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: true
+                display: true,
+                position: 'top'
             }
         },
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'TZS ' + value.toLocaleString();
+                    }
+                }
             }
         }
     }
@@ -294,6 +301,7 @@ new Chart(categorySalesCtx, {
     },
     options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'right'
