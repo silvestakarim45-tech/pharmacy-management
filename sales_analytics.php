@@ -46,6 +46,7 @@ $category_sales_query = "SELECT m.category, SUM(s.total_amount) as total
                         FROM sales s 
                         JOIN medicines m ON s.medicine_id = m.medicine_id 
                         WHERE DATE(s.sale_date) BETWEEN '$start_date' AND '$end_date'
+                        AND m.category IS NOT NULL AND m.category != ''
                         GROUP BY m.category 
                         ORDER BY total DESC";
 $category_sales_result = mysqli_query($conn, $category_sales_query);
@@ -278,6 +279,31 @@ const categorySalesData = <?php
         $labels[] = $row['category'];
         $data[] = $row['total'];
     }
+    
+    // If no category data from sales, try to get from orders
+    if(empty($data)){
+        $category_orders_query = "SELECT m.category, SUM(o.total_amount) as total 
+                                FROM order_items oi 
+                                JOIN orders o ON oi.order_id = o.order_id 
+                                JOIN medicines m ON oi.medicine_id = m.medicine_id 
+                                WHERE DATE(o.order_date) BETWEEN '$start_date' AND '$end_date'
+                                AND o.status='completed'
+                                AND m.category IS NOT NULL AND m.category != ''
+                                GROUP BY m.category 
+                                ORDER BY total DESC";
+        $category_orders_result = mysqli_query($conn, $category_orders_query);
+        while($row = mysqli_fetch_assoc($category_orders_result)){
+            $labels[] = $row['category'];
+            $data[] = $row['total'];
+        }
+    }
+    
+    // If still no data, show empty chart with message
+    if(empty($data)){
+        $labels = ['Hakuna Data'];
+        $data = [0];
+    }
+    
     echo json_encode(['labels' => $labels, 'data' => $data]);
 ?>;
 
@@ -305,6 +331,15 @@ new Chart(categorySalesCtx, {
         plugins: {
             legend: {
                 position: 'right'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        let label = context.label || '';
+                        let value = context.parsed || 0;
+                        return label + ': TZS ' + value.toLocaleString();
+                    }
+                }
             }
         }
     }
