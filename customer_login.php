@@ -10,40 +10,38 @@ if(isset($_POST['username']) && isset($_POST['password'])) {
     if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
         $error = "Security token invalid. Tafadhali jaribu tena.";
     } else {
-    $username = sanitize_input($_POST['username']);
-    $password = $_POST['password'];
+        $username = sanitize_input($_POST['username']);
+        $password = $_POST['password'];
 
-    if(!validate_username($username)){
-        $error = "Username format batili";
-    } else {
-
-    $sql = "SELECT * FROM users WHERE username=? AND role='customer'";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "s", $username);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    if(mysqli_num_rows($result)==1){
-
-        $row = mysqli_fetch_assoc($result);
-
-        // Verify password using bcrypt
-        if(!password_verify($password, $row['password'])){
-            $error = "Username au Password si sahihi";
+        if(!validate_username($username)){
+            $error = "Username format batili";
         } else {
+            $sql = "SELECT * FROM users WHERE username=? AND role='customer'";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
 
-        $_SESSION['user_id'] = $row['user_id'];
-        $_SESSION['fullname'] = $row['fullname'];
-        $_SESSION['role'] = $row['role'];
-        $_SESSION['email'] = $row['email'];
-        $_SESSION['phone'] = $row['phone'];
+            if(mysqli_num_rows($result)==1){
+                $row = mysqli_fetch_assoc($result);
 
-        header("Location: customer_dashboard.php");
-        exit();
+                // Verify password using bcrypt
+                if(!password_verify($password, $row['password'])){
+                    $error = "Username au Password si sahihi";
+                } else {
+                    $_SESSION['user_id'] = $row['user_id'];
+                    $_SESSION['fullname'] = $row['fullname'];
+                    $_SESSION['role'] = $row['role'];
+                    $_SESSION['email'] = $row['email'];
+                    $_SESSION['phone'] = $row['phone'];
+
+                    header("Location: customer_dashboard.php");
+                    exit();
+                }
+            } else {
+                $error = "Username au Password si sahihi";
+            }
         }
-    }
-    else{
-        $error = "Username au Password si sahihi";
     }
 }
 ?>
