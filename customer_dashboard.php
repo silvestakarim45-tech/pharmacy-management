@@ -29,7 +29,8 @@ if(!$customer){
     if($user){
         $insert_customer = "INSERT INTO customers (user_id, customer_name, email, phone, address) VALUES (?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $insert_customer);
-        mysqli_stmt_bind_param($stmt, "issss", $user_id, $user['fullname'], $user['email'], $user['phone'], '');
+        $address = '';
+        mysqli_stmt_bind_param($stmt, "issss", $user_id, $user['fullname'], $user['email'], $user['phone'], $address);
         mysqli_stmt_execute($stmt);
 
         // Fetch the newly created customer
