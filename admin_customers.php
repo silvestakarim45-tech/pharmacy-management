@@ -158,7 +158,8 @@ $customers_result = mysqli_query($conn, $customers_query);
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="password" name="password" placeholder="Password" required>
+                        <input type="text" name="password" placeholder="Password" required>
+                        <small style="color: #666; font-size: 11px;">Password itaonyeshwa kwa ajili ya urahisi</small>
                     </div>
                 </div>
                 <div class="form-row">
