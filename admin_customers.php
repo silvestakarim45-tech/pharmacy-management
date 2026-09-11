@@ -158,8 +158,11 @@ $customers_result = mysqli_query($conn, $customers_query);
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="text" name="password" placeholder="Password" required>
-                        <small style="color: #666; font-size: 11px;">Password itaonyeshwa kwa ajili ya urahisi</small>
+                        <input type="password" name="password" id="customer_password" placeholder="Password" required>
+                        <div style="margin-top: 5px;">
+                            <input type="checkbox" id="show_customer_password" onclick="toggleCustomerPassword()">
+                            <label for="show_customer_password" style="font-size: 12px; color: #666;">Onyesha Password</label>
+                        </div>
                     </div>
                 </div>
                 <div class="form-row">
@@ -227,7 +230,19 @@ $customers_result = mysqli_query($conn, $customers_query);
                 </tbody>
             </table>
         </div>
-    </div>
+ script>
+function toggleCustomerPassword() {
+    var passwordInput = document.getElementById("customer_password");
+    var checkbox = document.getElementById("show_customer_password");
+    if (checkbox.checked) {
+        passwordInput.type = "text";
+    } else {
+        passwordInput.type = "password";
+    }
+}
+</script>
+
+<   </div>
 </div>
 
 </body>
