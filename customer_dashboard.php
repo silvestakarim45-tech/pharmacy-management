@@ -17,6 +17,31 @@ mysqli_stmt_execute($stmt);
 $customer_result = mysqli_stmt_get_result($stmt);
 $customer = mysqli_fetch_assoc($customer_result);
 
+// If customer record doesn't exist, create it
+if(!$customer){
+    $user_query = "SELECT * FROM users WHERE user_id=?";
+    $stmt = mysqli_prepare($conn, $user_query);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    $user_result = mysqli_stmt_get_result($stmt);
+    $user = mysqli_fetch_assoc($user_result);
+
+    if($user){
+        $insert_customer = "INSERT INTO customers (user_id, customer_name, email, phone, address) VALUES (?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $insert_customer);
+        mysqli_stmt_bind_param($stmt, "issss", $user_id, $user['fullname'], $user['email'], $user['phone'], '');
+        mysqli_stmt_execute($stmt);
+
+        // Fetch the newly created customer
+        $customer_query = "SELECT * FROM customers WHERE user_id=?";
+        $stmt = mysqli_prepare($conn, $customer_query);
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        $customer_result = mysqli_stmt_get_result($stmt);
+        $customer = mysqli_fetch_assoc($customer_result);
+    }
+}
+
 // Get all available medicines
 $medicines_query = "SELECT * FROM medicines WHERE quantity > 0 ORDER BY medicine_name ASC";
 $medicines_result = mysqli_query($conn, $medicines_query);
