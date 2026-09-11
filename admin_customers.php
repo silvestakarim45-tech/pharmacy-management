@@ -230,7 +230,10 @@ $customers_result = mysqli_query($conn, $customers_query);
                 </tbody>
             </table>
         </div>
- script>
+    </div>
+</div>
+
+<script>
 function toggleCustomerPassword() {
     var passwordInput = document.getElementById("customer_password");
     var checkbox = document.getElementById("show_customer_password");
@@ -241,9 +244,6 @@ function toggleCustomerPassword() {
     }
 }
 </script>
-
-<   </div>
-</div>
 
 </body>
 </html>
