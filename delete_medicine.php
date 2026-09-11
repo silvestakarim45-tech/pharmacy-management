@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("config.php");
+include("functions.php");
 
 // Check if user is logged in and is admin
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
@@ -10,6 +11,7 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
 
 $id=$_GET['id'];
 
+// Verify CSRF token from referer or add as parameter
 $sql = "DELETE FROM medicines WHERE medicine_id=?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $id);

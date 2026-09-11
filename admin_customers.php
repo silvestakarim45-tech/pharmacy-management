@@ -213,6 +213,7 @@ $customers_result = mysqli_query($conn, $customers_query);
                         <td><?php echo $customer['address'] ? $customer['address'] : '-'; ?></td>
                         <td>
                             <a href="view_customer.php?id=<?php echo $customer['customer_id']; ?>" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">👁️ View</a>
+                            <a href="customer_purchase_history.php?id=<?php echo $customer['customer_id']; ?>" class="btn btn-success" style="padding: 5px 10px; font-size: 12px;">📋 History</a>
                             <a href="edit_customer.php?id=<?php echo $customer['customer_id']; ?>" class="btn btn-warning" style="padding: 5px 10px; font-size: 12px;">✏️ Edit</a>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">

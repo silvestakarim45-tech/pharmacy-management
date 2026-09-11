@@ -34,6 +34,7 @@ $medicines=mysqli_query($conn,
                 <li><a href="admin_dashboard.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
                 <li><a href="medicine.php"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
                 <li><a href="inventory_management.php"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+                <li><a href="stock_alerts.php"><i class="fas fa-bell"></i> <span>Stock Alerts</span></a></li>
                 <li><a href="suppliers.php"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
                 <li><a href="sales_analytics.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
                 <li><a href="audit_logs.php"><i class="fas fa-history"></i> <span>Audit Logs</span></a></li>
@@ -84,10 +85,11 @@ $medicines=mysqli_query($conn,
                 } else {
                     $new_stock=$current_stock-$quantity_sold;
                     $total_amount=$data['selling_price']*$quantity_sold;
+                    $seller_id = $_SESSION['user_id'];
 
-                    $sql = "INSERT INTO sales (medicine_id,quantity_sold,total_amount) VALUES (?,?,?)";
+                    $sql = "INSERT INTO sales (medicine_id,quantity_sold,total_amount,seller_id) VALUES (?,?,?,?)";
                     $stmt = mysqli_prepare($conn, $sql);
-                    mysqli_stmt_bind_param($stmt, "iid", $medicine_id, $quantity_sold, $total_amount);
+                    mysqli_stmt_bind_param($stmt, "iidi", $medicine_id, $quantity_sold, $total_amount, $seller_id);
                     mysqli_stmt_execute($stmt);
 
                     $sql = "UPDATE medicines SET quantity=? WHERE medicine_id=?";
@@ -145,6 +147,7 @@ $medicines=mysqli_query($conn,
                             <th>Idadi</th>
                             <th>Jumla (TZS)</th>
                             <th>Saa</th>
+                            <th>Receipt</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -129,15 +129,20 @@ $users_to_create = [
 ];
 
 foreach($users_to_create as $user_info){
-    $check_user = "SELECT * FROM users WHERE username='$user_info[0]'";
-    $result = mysqli_query($conn, $check_user);
+    $check_user = "SELECT * FROM users WHERE username=?";
+    $stmt = mysqli_prepare($conn, $check_user);
+    mysqli_stmt_bind_param($stmt, "s", $user_info[0]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
     if(mysqli_num_rows($result) == 0){
         $password = password_hash($user_info[1], PASSWORD_DEFAULT);
         $sql = "INSERT INTO users (username, password, fullname, email, phone, role)
-                VALUES ('$user_info[0]', '$password', '$user_info[2]', '$user_info[3]', '$user_info[4]', '$user_info[5]')";
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssssss", $user_info[0], $password, $user_info[2], $user_info[3], $user_info[4], $user_info[5]);
 
-        if(mysqli_query($conn, $sql)){
+        if(mysqli_stmt_execute($stmt)){
             echo "✅ $user_info[5] user '$user_info[0]' created successfully<br>";
         } else {
             echo "❌ Error creating $user_info[5] user: " . mysqli_error($conn) . "<br>";
@@ -148,18 +153,32 @@ foreach($users_to_create as $user_info){
 }
 
 // Insert sample customer
-$check_customer = "SELECT * FROM customers WHERE customer_name='Test Customer'";
-$cust_result = mysqli_query($conn, $check_customer);
+$check_customer = "SELECT * FROM customers WHERE customer_name=?";
+$stmt = mysqli_prepare($conn, $check_customer);
+mysqli_stmt_bind_param($stmt, "s", $test_customer_name);
+$test_customer_name = 'Test Customer';
+mysqli_stmt_execute($stmt);
+$cust_result = mysqli_stmt_get_result($stmt);
 
 if(mysqli_num_rows($cust_result) == 0){
-    $get_user_id = "SELECT user_id FROM users WHERE username='customer'";
-    $user_result = mysqli_query($conn, $get_user_id);
+    $get_user_id = "SELECT user_id FROM users WHERE username=?";
+    $stmt = mysqli_prepare($conn, $get_user_id);
+    $username = 'customer';
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    $user_result = mysqli_stmt_get_result($stmt);
     $user_row = mysqli_fetch_assoc($user_result);
-    
-    $sql = "INSERT INTO customers (user_id, customer_name, phone, email, address) 
-            VALUES ('".$user_row['user_id']."', 'Test Customer', '+255123456787', 'customer@example.com', 'Dar es Salaam, Tanzania')";
-    
-    if(mysqli_query($conn, $sql)){
+
+    $sql = "INSERT INTO customers (user_id, customer_name, phone, email, address)
+            VALUES (?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($conn, $sql);
+    $customer_name = 'Test Customer';
+    $phone = '+255123456787';
+    $email = 'customer@example.com';
+    $address = 'Dar es Salaam, Tanzania';
+    mysqli_stmt_bind_param($stmt, "issss", $user_row['user_id'], $customer_name, $phone, $email, $address);
+
+    if(mysqli_stmt_execute($stmt)){
         echo "✅ Sample customer created<br>";
     }
 }
@@ -181,9 +200,11 @@ if(mysqli_num_rows($med_result) == 0){
     ];
     
     foreach($sample_medicines as $medicine){
-        $sql = "INSERT INTO medicines (medicine_name, category, description, quantity, buying_price, selling_price, expiry_date) 
-                VALUES ('$medicine[0]', '$medicine[1]', '$medicine[2]', $medicine[3], $medicine[4], $medicine[5], '$medicine[6]')";
-        mysqli_query($conn, $sql);
+        $sql = "INSERT INTO medicines (medicine_name, category, description, quantity, buying_price, selling_price, expiry_date)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssiddds", $medicine[0], $medicine[1], $medicine[2], $medicine[3], $medicine[4], $medicine[5], $medicine[6]);
+        mysqli_stmt_execute($stmt);
     }
     echo "✅ Sample medicines inserted<br>";
 } else {

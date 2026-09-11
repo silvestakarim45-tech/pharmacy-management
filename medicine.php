@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("config.php");
+include("functions.php");
 
 // Check if user is logged in and is admin
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
@@ -14,7 +15,7 @@ $params = [];
 $types = "";
 
 if(isset($_GET['search']) && !empty($_GET['search'])){
-    $search = $_GET['search'];
+    $search = sanitize_input($_GET['search']);
     $where_conditions[] = "(medicine_name LIKE ? OR category LIKE ? OR description LIKE ?)";
     $search_param = "%$search%";
     $params[] = $search_param;
@@ -24,7 +25,7 @@ if(isset($_GET['search']) && !empty($_GET['search'])){
 }
 
 if(isset($_GET['category']) && !empty($_GET['category'])){
-    $category = $_GET['category'];
+    $category = sanitize_input($_GET['category']);
     $where_conditions[] = "category = ?";
     $params[] = $category;
     $types .= "s";
@@ -32,16 +33,20 @@ if(isset($_GET['category']) && !empty($_GET['category'])){
 
 if(isset($_GET['min_price']) && !empty($_GET['min_price'])){
     $min_price = $_GET['min_price'];
-    $where_conditions[] = "selling_price >= ?";
-    $params[] = $min_price;
-    $types .= "d";
+    if(validate_number($min_price, 0)){
+        $where_conditions[] = "selling_price >= ?";
+        $params[] = $min_price;
+        $types .= "d";
+    }
 }
 
 if(isset($_GET['max_price']) && !empty($_GET['max_price'])){
     $max_price = $_GET['max_price'];
-    $where_conditions[] = "selling_price <= ?";
-    $params[] = $max_price;
-    $types .= "d";
+    if(validate_number($max_price, 0)){
+        $where_conditions[] = "selling_price <= ?";
+        $params[] = $max_price;
+        $types .= "d";
+    }
 }
 
 if(isset($_GET['stock_status']) && !empty($_GET['stock_status'])){
@@ -105,6 +110,7 @@ $categories_result = mysqli_query($conn, $categories_query);
                 <li><a href="admin_dashboard.php"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
                 <li><a href="medicine.php" class="active"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
                 <li><a href="inventory_management.php"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+                <li><a href="stock_alerts.php"><i class="fas fa-bell"></i> <span>Stock Alerts</span></a></li>
                 <li><a href="suppliers.php"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
                 <li><a href="sales_analytics.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
                 <li><a href="audit_logs.php"><i class="fas fa-history"></i> <span>Audit Logs</span></a></li>

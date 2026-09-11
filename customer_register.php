@@ -50,16 +50,15 @@ if(isset($_POST['register'])){
         $stmt = mysqli_prepare($conn, $customer_sql);
         mysqli_stmt_bind_param($stmt, "issss", $user_id, $fullname, $phone, $email, $address);
         if(mysqli_stmt_execute($stmt)){
-                $success = "Umefanikiwa kujisajili! Sasa unaweza login.";
-            } else {
-                $error = "Error creating customer profile: " . mysqli_error($conn);
-            }
+            $success = "Umefanikiwa kujisajili! Sasa unaweza login.";
         } else {
-            $error = "Error creating user: " . mysqli_error($conn);
+            $error = "Error creating customer profile: " . mysqli_error($conn);
         }
+    } else {
+        $error = "Error creating user: " . mysqli_error($conn);
     }
     }
-    }
+}
 }
 ?>
 

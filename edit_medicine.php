@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("config.php");
+include("functions.php");
 
 // Check if user is logged in and is admin
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
@@ -18,23 +19,27 @@ $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 
 if(isset($_POST['update'])){
+    // Verify CSRF token
+    if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
+        $error = "Security token invalid. Tafadhali jaribu tena.";
+    } else {
+        $name=$_POST['medicine_name'];
+        $category=$_POST['category'];
+        $quantity=$_POST['quantity'];
+        $buying=$_POST['buying_price'];
+        $selling=$_POST['selling_price'];
+        $expiry=$_POST['expiry_date'];
 
-$name=$_POST['medicine_name'];
-$category=$_POST['category'];
-$quantity=$_POST['quantity'];
-$buying=$_POST['buying_price'];
-$selling=$_POST['selling_price'];
-$expiry=$_POST['expiry_date'];
+        $sql = "UPDATE medicines SET
+        medicine_name=?, category=?, quantity=?, buying_price=?, selling_price=?, expiry_date=?
+        WHERE medicine_id=?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "ssiddsi", $name, $category, $quantity, $buying, $selling, $expiry, $id);
+        mysqli_stmt_execute($stmt);
 
-$sql = "UPDATE medicines SET
-medicine_name=?, category=?, quantity=?, buying_price=?, selling_price=?, expiry_date=?
-WHERE medicine_id=?";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ssiddsi", $name, $category, $quantity, $buying, $selling, $expiry, $id);
-mysqli_stmt_execute($stmt);
-
-header("Location: medicine.php");
-exit();
+        header("Location: medicine.php");
+        exit();
+    }
 }
 ?>
 
@@ -82,7 +87,14 @@ exit();
                 <h2>Badilisha taarifa za dawa: <?php echo $row['medicine_name']; ?></h2>
             </div>
 
+            <?php if(isset($error)): ?>
+            <div class="alert alert-danger">
+                <?php echo $error; ?>
+            </div>
+            <?php endif; ?>
+
             <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                 <div class="form-group">
                     <label>Jina la Dawa</label>
                     <input type="text" name="medicine_name" value="<?php echo $row['medicine_name']; ?>" required>

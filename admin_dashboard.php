@@ -75,6 +75,7 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                 <li><a href="admin_dashboard.php" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
                 <li><a href="medicine.php"><i class="fas fa-pills"></i> <span>Dawa</span></a></li>
                 <li><a href="inventory_management.php"><i class="fas fa-boxes"></i> <span>Inventory</span></a></li>
+                <li><a href="stock_alerts.php"><i class="fas fa-bell"></i> <span>Stock Alerts</span></a></li>
                 <li><a href="suppliers.php"><i class="fas fa-truck"></i> <span>Suppliers</span></a></li>
                 <li><a href="sales_analytics.php"><i class="fas fa-chart-bar"></i> <span>Analytics</span></a></li>
                 <li><a href="audit_logs.php"><i class="fas fa-history"></i> <span>Audit Logs</span></a></li>
@@ -107,6 +108,9 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                 <h3>Jumla ya Dawa</h3>
                 <div class="number"><?php echo $medicines_count; ?></div>
                 <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona dawa</small>
+                <div style="margin-top: 10px;">
+                    <a href="export_medicines_csv.php" class="btn btn-info" style="padding: 5px 10px; font-size: 11px;">📥 Export CSV</a>
+                </div>
             </div>
 
             <!-- Medicines List (Hidden by default) -->
@@ -274,6 +278,9 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                 <h3>Mauzo (POS)</h3>
                 <div class="number"><?php echo $sales_count; ?></div>
                 <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona mauzo</small>
+                <div style="margin-top: 10px;">
+                    <a href="export_sales_csv.php" class="btn btn-info" style="padding: 5px 10px; font-size: 11px;">📥 Export CSV</a>
+                </div>
             </div>
 
             <!-- Orders List (Hidden by default) -->
@@ -317,6 +324,9 @@ $recent_orders = mysqli_query($conn,"SELECT o.*, c.customer_name FROM orders o
                 <h3>Agizo Mtandaoni</h3>
                 <div class="number"><?php echo $orders_count; ?></div>
                 <small style="color: #7f8c8d; font-size: 12px;">Bonyeza kuona agizo</small>
+                <div style="margin-top: 10px;">
+                    <a href="export_orders_csv.php" class="btn btn-info" style="padding: 5px 10px; font-size: 11px;">📥 Export CSV</a>
+                </div>
             </div>
 
             <!-- Revenue Info (Hidden by default) -->

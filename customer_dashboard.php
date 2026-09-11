@@ -100,10 +100,9 @@ if(isset($_POST['place_order'])){
             mysqli_stmt_execute($stmt);
         }
 
-            // Clear cart
-            unset($_SESSION['cart']);
-            $order_success = "Agizo lako limetumwa kwa mafanikio!";
-        }
+        // Clear cart
+        unset($_SESSION['cart']);
+        $order_success = "Agizo lako limetumwa kwa mafanikio!";
     }
 }
 
