@@ -12,7 +12,7 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
 $customer_id = $_GET['id'];
 
 // Get customer details
-$sql = "SELECT c.*, u.username, u.email as user_email, u.phone as user_phone
+$sql = "SELECT c.*, u.username, u.email as user_email, u.phone as user_phone, u.created_at as user_created_at
         FROM customers c
         JOIN users u ON c.user_id = u.user_id
         WHERE c.customer_id=?";
@@ -90,7 +90,7 @@ $customer = mysqli_fetch_assoc($result);
                     <strong>Anuani:</strong> <?php echo $customer['address'] ? $customer['address'] : '-'; ?>
                 </div>
                 <div class="detail-row">
-                    <strong>Imeandikwa:</strong> <?php echo date('Y-m-d H:i', strtotime($customer['created_at'])); ?>
+                    <strong>Imeandikwa:</strong> <?php echo $customer['user_created_at'] ? date('Y-m-d H:i', strtotime($customer['user_created_at'])) : '-'; ?>
                 </div>
             </div>
 
