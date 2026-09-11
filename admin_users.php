@@ -108,8 +108,8 @@ if(isset($_POST['edit_user'])){
     }
 }
 
-// Get all users except current admin
-$users_query = "SELECT * FROM users WHERE user_id!=? ORDER BY user_id DESC";
+// Get all users except current admin and customers (only show admin and seller roles)
+$users_query = "SELECT * FROM users WHERE user_id!=? AND role!='customer' ORDER BY user_id DESC";
 $stmt = mysqli_prepare($conn, $users_query);
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
 mysqli_stmt_execute($stmt);
