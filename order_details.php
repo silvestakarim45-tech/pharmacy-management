@@ -21,6 +21,21 @@ mysqli_stmt_execute($stmt);
 $order_result = mysqli_stmt_get_result($stmt);
 $order = mysqli_fetch_assoc($order_result);
 
+// Handle payment confirmation (admin and seller only)
+if(isset($_POST['confirm_payment']) && in_array($_SESSION['role'], ['admin', 'seller'])){
+    // Verify CSRF token
+    if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
+        $error = "Security token invalid";
+    } else {
+        $update_order = "UPDATE orders SET payment_status='paid' WHERE order_id=?";
+        $stmt = mysqli_prepare($conn, $update_order);
+        mysqli_stmt_bind_param($stmt, "i", $order_id);
+        mysqli_stmt_execute($stmt);
+        header("Location: order_details.php?id=$order_id");
+        exit();
+    }
+}
+
 // Get order items
 $items_query = "SELECT oi.*, m.medicine_name
                FROM order_items oi
@@ -148,6 +163,15 @@ if(isset($_POST['update_status']) && in_array($_SESSION['role'], ['admin', 'sell
                     <h3>Status</h3>
                     <div><?php echo ucfirst($order['status']); ?></div>
                 </div>
+                <div class="stat-card">
+                    <h3>Malipo</h3>
+                    <div>
+                        <?php
+                        $payment_status = isset($order['payment_status']) ? $order['payment_status'] : 'unpaid';
+                        echo ucfirst($payment_status);
+                        ?>
+                    </div>
+                </div>
             </div>
 
             <div style="margin: 30px 0;">
@@ -195,6 +219,18 @@ if(isset($_POST['update_status']) && in_array($_SESSION['role'], ['admin', 'sell
                     <button type="submit" name="update_status" class="btn btn-success">Sasisha Status</button>
                 </form>
             </div>
+
+            <?php
+            $payment_status = isset($order['payment_status']) ? $order['payment_status'] : 'unpaid';
+            if($payment_status == 'unpaid'):
+            ?>
+            <div style="margin-top: 20px;">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                    <button type="submit" name="confirm_payment" class="btn btn-info">Thibitisha Malipo</button>
+                </form>
+            </div>
+            <?php endif; ?>
             <?php endif; ?>
 
             <div style="margin-top: 30px;">
