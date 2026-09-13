@@ -19,6 +19,17 @@ if(isset($_POST['process_order'])){
     exit();
 }
 
+// Handle payment confirmation
+if(isset($_POST['confirm_payment'])){
+    $order_id = $_POST['order_id'];
+    $update_order = "UPDATE orders SET payment_status='paid' WHERE order_id=?";
+    $stmt = mysqli_prepare($conn, $update_order);
+    mysqli_stmt_bind_param($stmt, "i", $order_id);
+    mysqli_stmt_execute($stmt);
+    header("Location: seller_orders.php");
+    exit();
+}
+
 // Handle order completion
 if(isset($_POST['complete_order'])){
     $order_id = $_POST['order_id'];
@@ -88,6 +99,7 @@ $orders_result = mysqli_query($conn, $orders_query);
                         <th>Mteja</th>
                         <th>Jumla</th>
                         <th>Status</th>
+                        <th>Malipo</th>
                         <th>Tarehe</th>
                         <th>Matendo</th>
                     </tr>
@@ -112,6 +124,20 @@ $orders_result = mysqli_query($conn, $orders_query);
                                 <?php echo ucfirst($order['status']); ?>
                             </span>
                         </td>
+                        <td>
+                            <?php
+                            $payment_status = isset($order['payment_status']) ? $order['payment_status'] : 'unpaid';
+                            $payment_class = '';
+                            switch($payment_status){
+                                case 'unpaid': $payment_class = 'alert-danger'; break;
+                                case 'paid': $payment_class = 'alert-success'; break;
+                                case 'refunded': $payment_class = 'alert-warning'; break;
+                            }
+                            ?>
+                            <span class="alert <?php echo $payment_class; ?>" style="display: inline-block; padding: 5px 10px; font-size: 12px;">
+                                <?php echo ucfirst($payment_status); ?>
+                            </span>
+                        </td>
                         <td><?php echo date('Y-m-d H:i', strtotime($order['order_date'])); ?></td>
                         <td>
                             <a href="order_details.php?id=<?php echo $order['order_id']; ?>" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">Angalia</a>
@@ -122,10 +148,18 @@ $orders_result = mysqli_query($conn, $orders_query);
                             </form>
                             <?php endif; ?>
                             <?php if($order['status'] == 'processing'): ?>
+                            <?php if(isset($order['payment_status']) && $order['payment_status'] == 'unpaid'): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
+                                <button type="submit" name="confirm_payment" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">Thibitisha Malipo</button>
+                            </form>
+                            <?php endif; ?>
+                            <?php if(isset($order['payment_status']) && $order['payment_status'] == 'paid'): ?>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
                                 <button type="submit" name="complete_order" class="btn btn-success" style="padding: 5px 10px; font-size: 12px;">Complete</button>
                             </form>
+                            <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>
