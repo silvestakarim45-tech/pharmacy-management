@@ -106,7 +106,9 @@ if(isset($_POST['place_order'])){
         $order_query = "INSERT INTO orders (customer_id, total_amount, status, delivery_address, phone, notes)
                         VALUES (?, ?, 'pending', ?, ?, '')";
         $stmt = mysqli_prepare($conn, $order_query);
-        mysqli_stmt_bind_param($stmt, "idss", $customer_id, $total_amount, $customer['address'], $customer['phone']);
+        $address = $customer['address'] ? $customer['address'] : '';
+        $phone = $customer['phone'] ? $customer['phone'] : '';
+        mysqli_stmt_bind_param($stmt, "idsss", $customer_id, $total_amount, $address, $phone, '');
         mysqli_stmt_execute($stmt);
         $order_id = mysqli_insert_id($conn);
 
@@ -128,7 +130,11 @@ if(isset($_POST['place_order'])){
 
         // Clear cart
         unset($_SESSION['cart']);
-        $order_success = "Agizo lako limetumwa kwa mafanikio!";
+        $order_success = "✅ Agizo lako limetumwa kwa mafanikio!<br><br>
+                          <strong>Order ID:</strong> #$order_id<br>
+                          <strong>Jumla:</strong> TZS " . number_format($total_amount, 2) . "<br>
+                          <strong>Status:</strong> Pending (Inasubiri kuthibitishwa na admin)<br>
+                          <small>Tafadhali subiri admin kuthibitisha agizo lako. Unaweza kuona status ya agizo lako kwenye 'Agizo Zangu'.</small>";
     }
 }
 
