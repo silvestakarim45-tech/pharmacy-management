@@ -148,13 +148,16 @@ $orders_result = mysqli_query($conn, $orders_query);
                             </form>
                             <?php endif; ?>
                             <?php if($order['status'] == 'processing'): ?>
-                            <?php if(isset($order['payment_status']) && $order['payment_status'] == 'unpaid'): ?>
+                            <?php
+                            $payment_status = isset($order['payment_status']) ? $order['payment_status'] : 'unpaid';
+                            if($payment_status == 'unpaid'):
+                            ?>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
                                 <button type="submit" name="confirm_payment" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">Thibitisha Malipo</button>
                             </form>
                             <?php endif; ?>
-                            <?php if(isset($order['payment_status']) && $order['payment_status'] == 'paid'): ?>
+                            <?php if($payment_status == 'paid'): ?>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="order_id" value="<?php echo $order['order_id']; ?>">
                                 <button type="submit" name="complete_order" class="btn btn-success" style="padding: 5px 10px; font-size: 12px;">Complete</button>
