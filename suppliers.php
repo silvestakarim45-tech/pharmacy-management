@@ -2,6 +2,7 @@
 session_start();
 include("config.php");
 include("functions.php");
+include("api_auth.php");
 
 // Check if user is logged in and is admin
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin'){
@@ -71,6 +72,30 @@ if(isset($_POST['delete_supplier'])){
         mysqli_stmt_execute($stmt);
         
         $success = "Supplier deleted successfully";
+    }
+}
+
+// Handle API key generation
+if(isset($_POST['generate_api_key'])){
+    if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
+        $error = "Security token invalid";
+    } else {
+        $supplier_id = $_POST['supplier_id'];
+        $apiAuth = new APIAuth($conn);
+        $api_key = $apiAuth->generateApiKey($supplier_id);
+        $success = "API key generated: " . $api_key;
+    }
+}
+
+// Handle API key revocation
+if(isset($_POST['revoke_api_key'])){
+    if(!isset($_POST['csrf_token']) || !verify_csrf_token($_POST['csrf_token'])){
+        $error = "Security token invalid";
+    } else {
+        $supplier_id = $_POST['supplier_id'];
+        $apiAuth = new APIAuth($conn);
+        $apiAuth->revokeApiKey($supplier_id);
+        $success = "API key revoked successfully";
     }
 }
 
@@ -255,6 +280,19 @@ if(isset($_GET['edit'])){
                         </td>
                         <td>
                             <a href="suppliers.php?edit=<?php echo $supplier['supplier_id']; ?>" class="btn btn-info" style="padding: 5px 10px; font-size: 12px;">✏️ Edit</a>
+                            <?php if(isset($supplier['api_key']) && !empty($supplier['api_key'])): ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
+                                <button type="submit" name="revoke_api_key" class="btn btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="return confirm('Una hakika unataka ku-revoke API key?');">🔑 Revoke Key</button>
+                            </form>
+                            <?php else: ?>
+                            <form method="POST" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
+                                <button type="submit" name="generate_api_key" class="btn btn-success" style="padding: 5px 10px; font-size: 12px;">🔑 Generate Key</button>
+                            </form>
+                            <?php endif; ?>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                                 <input type="hidden" name="supplier_id" value="<?php echo $supplier['supplier_id']; ?>">
