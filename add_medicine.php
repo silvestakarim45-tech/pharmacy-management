@@ -17,13 +17,14 @@ $quantity=$_POST['quantity'];
 $buying=$_POST['buying_price'];
 $selling=$_POST['selling_price'];
 $expiry=$_POST['expiry_date'];
+$supplier_id = isset($_POST['supplier_id']) && !empty($_POST['supplier_id']) ? $_POST['supplier_id'] : NULL;
 
 $sql="INSERT INTO medicines
-(medicine_name,category,quantity,buying_price,selling_price,expiry_date)
+(medicine_name,category,quantity,buying_price,selling_price,expiry_date,supplier_id)
 VALUES
-(?,?,?,?,?,?)";
+(?,?,?,?,?,?,?)";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ssidds", $name, $category, $quantity, $buying, $selling, $expiry);
+mysqli_stmt_bind_param($stmt, "ssiddsi", $name, $category, $quantity, $buying, $selling, $expiry, $supplier_id);
 
 try {
     mysqli_stmt_execute($stmt);
@@ -33,6 +34,10 @@ try {
     $error = "Error: " . $e->getMessage();
 }
 }
+
+// Get all suppliers
+$suppliers_query = "SELECT * FROM suppliers WHERE status='active' ORDER BY supplier_name ASC";
+$suppliers_result = mysqli_query($conn, $suppliers_query);
 ?>
 
 <!DOCTYPE html>
@@ -117,6 +122,19 @@ try {
                 <div class="form-group">
                     <label>Tarehe ya Kuisha Muda</label>
                     <input type="date" name="expiry_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Supplier (Chagua)</label>
+                    <select name="supplier_id">
+                        <option value="">-- Chagua Supplier --</option>
+                        <?php while($supplier = mysqli_fetch_assoc($suppliers_result)): ?>
+                        <option value="<?php echo $supplier['supplier_id']; ?>">
+                            <?php echo $supplier['supplier_name']; ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                    <small style="color: #666;">Chagua supplier anayetoa dawa hii (optional)</small>
                 </div>
 
                 <button type="submit" name="save" class="btn btn-success">💾 Hifadhi Dawa</button>

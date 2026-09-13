@@ -29,18 +29,23 @@ if(isset($_POST['update'])){
         $buying=$_POST['buying_price'];
         $selling=$_POST['selling_price'];
         $expiry=$_POST['expiry_date'];
+        $supplier_id = isset($_POST['supplier_id']) && !empty($_POST['supplier_id']) ? $_POST['supplier_id'] : NULL;
 
         $sql = "UPDATE medicines SET
-        medicine_name=?, category=?, quantity=?, buying_price=?, selling_price=?, expiry_date=?
+        medicine_name=?, category=?, quantity=?, buying_price=?, selling_price=?, expiry_date=?, supplier_id=?
         WHERE medicine_id=?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssiddsi", $name, $category, $quantity, $buying, $selling, $expiry, $id);
+        mysqli_stmt_bind_param($stmt, "ssiddsii", $name, $category, $quantity, $buying, $selling, $expiry, $supplier_id, $id);
         mysqli_stmt_execute($stmt);
 
         header("Location: medicine.php");
         exit();
     }
 }
+
+// Get all suppliers
+$suppliers_query = "SELECT * FROM suppliers WHERE status='active' ORDER BY supplier_name ASC";
+$suppliers_result = mysqli_query($conn, $suppliers_query);
 ?>
 
 <!DOCTYPE html>
@@ -125,6 +130,19 @@ if(isset($_POST['update'])){
                 <div class="form-group">
                     <label>Tarehe ya Kuisha Muda</label>
                     <input type="date" name="expiry_date" value="<?php echo $row['expiry_date']; ?>" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Supplier (Chagua)</label>
+                    <select name="supplier_id">
+                        <option value="">-- Chagua Supplier --</option>
+                        <?php while($supplier = mysqli_fetch_assoc($suppliers_result)): ?>
+                        <option value="<?php echo $supplier['supplier_id']; ?>" <?php echo isset($row['supplier_id']) && $row['supplier_id'] == $supplier['supplier_id'] ? 'selected' : ''; ?>>
+                            <?php echo $supplier['supplier_name']; ?>
+                        </option>
+                        <?php endwhile; ?>
+                    </select>
+                    <small style="color: #666;">Chagua supplier anayetoa dawa hii (optional)</small>
                 </div>
 
                 <button type="submit" name="update" class="btn btn-success">💾 Sasisha Taarifa</button>
