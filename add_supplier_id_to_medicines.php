@@ -14,13 +14,23 @@ if(mysqli_query($conn, $sql)){
     echo "❌ Error adding column: " . mysqli_error($conn) . "<br>";
 }
 
-// Add foreign key constraint
-$sql_fk = "ALTER TABLE medicines ADD CONSTRAINT fk_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE SET NULL";
+// Add foreign key constraint (check if it exists first)
+$sql_check = "SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS 
+              WHERE TABLE_SCHEMA = 'pharmacy_management' 
+              AND TABLE_NAME = 'medicines' 
+              AND CONSTRAINT_TYPE = 'FOREIGN KEY' 
+              AND CONSTRAINT_NAME = 'fk_supplier'";
+$result = mysqli_query($conn, $sql_check);
 
-if(mysqli_query($conn, $sql_fk)){
-    echo "✅ Foreign key constraint added successfully<br>";
+if(mysqli_num_rows($result) == 0){
+    $sql_fk = "ALTER TABLE medicines ADD CONSTRAINT fk_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id) ON DELETE SET NULL";
+    if(mysqli_query($conn, $sql_fk)){
+        echo "✅ Foreign key constraint added successfully<br>";
+    } else {
+        echo "❌ Error adding foreign key: " . mysqli_error($conn) . "<br>";
+    }
 } else {
-    echo "❌ Error adding foreign key (may already exist): " . mysqli_error($conn) . "<br>";
+    echo "✅ Foreign key constraint already exists<br>";
 }
 
 mysqli_close($conn);
